@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini projet</title>
+
+    <link rel="stylesheet" type="text/css" href="styles.css">
+
+    <link rel="icon" type="image/x-icon" href="images/icon.png">
+
+    <!-- Background Image -->
+    <style>
+        body {
+            background-image: url('images/background.png');
+            background-repeat: no-repeat;
+            background-size: cover; 
+        }
+    </style>
+</head>
+<body>
+    <h1 class="titre">Mini projet IOT : Rayen Ben Amor TIC3</h1>
+    
+    <h2>capteur en temps réel humidité/température</h2>
+    <p>Humidité 💧 : <span id="humidity">--%</span></p>
+    <p>Température 🌡️ : <span id="temperature">--°C</span></p>
+    
+    <form>
+        <input type="radio" id="startReading" name="readingStatus" value="ON" checked>
+        <label for="startReading">Start Reading</label>
+        <input type="radio" id="stopReading" name="readingStatus" value="OFF">
+        <label for="stopReading">Stop Reading</label>
+    </form>
+
+    <script>
+        var socket = new WebSocket("ws://192.168.1.100:80/");  //ESP8266 IP address STATIQUE PORT 80
+        var startReading = document.getElementById("startReading");
+        var stopReading = document.getElementById("stopReading");
+
+        startReading.addEventListener("change", function() {
+            if (startReading.checked) {
+                socket.send("ON");
+            }
+        });
+
+        stopReading.addEventListener("change", function() {
+            if (stopReading.checked) {
+                socket.send("OFF");
+            }
+        });
+
+        socket.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            document.getElementById("humidity").innerText = data.humidity + "%";
+            document.getElementById("temperature").innerText = data.temperature + "°C";
+        };
+    </script>
+</body>
+</html>
